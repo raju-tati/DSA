@@ -1,11 +1,40 @@
 use strict;
 use warnings;
 
+sub splitStringOnWords {
+	my ($string) = @_;
+	my @stringList = split("", $string);
+
+	my @splitStringOnWords;
+	my $subString = "";
+
+	foreach my $element (@stringList) {
+		if($element eq "\n") {
+			push(@splitStringOnWords, $subString);
+			push(@splitStringOnWords, "\n");
+			$subString = "";
+		}
+
+		elsif($element ne " ") {
+			$subString .= $element;
+		}
+		
+		else {
+			push(@splitStringOnWords, $subString);
+			push(@splitStringOnWords, " ");
+			$subString = "";
+		}
+	}
+
+	push(@splitStringOnWords, $subString);
+	return @splitStringOnWords;
+}
+
 sub printDiff {
 	my ($stringOne, $stringTwo) = @_;
 	
-	my @stringOneList = split(" ", $stringOne);
-	my @stringTwoList = split(" ", $stringTwo);
+	my @stringOneList = splitStringOnWords($stringOne);
+	my @stringTwoList = splitStringOnWords($stringTwo);
 	
 	my $stringOneCounter = 0;
 	my $stringTwoCounter = 0;
@@ -22,7 +51,7 @@ sub printDiff {
 			push(@{$diff}, ["unMatchedPart", $unMatchedPart]) if($unMatchedPart);
 			$unMatchedPart = "";
 			
-			$matchedPart .= $stringOneList[$stringOneCounter] . " ";
+			$matchedPart .= $stringOneList[$stringOneCounter];
 
 			$stringOneCounter++;
 			$stringTwoCounter++;
@@ -32,7 +61,7 @@ sub printDiff {
 		else {
 			push(@{$diff}, ["matchedPart", $matchedPart]) if($matchedPart);
 			$matchedPart = "";
-			$unMatchedPart .= $stringTwoList[$stringTwoCounter] . " ";
+			$unMatchedPart .= $stringTwoList[$stringTwoCounter];
 			$stringTwoCounter++;
 		}
 
@@ -57,15 +86,15 @@ sub printDiff {
 
 	foreach my $diffElement (@{$diff}) {
 		if($diffElement->[0] eq "unMatchedPartInStringOne") {
-			print("+++ ", $diffElement->[1], "\n" x 2);
+			print("+++ UnMatched Part In Source File\n", $diffElement->[1], "\n" );
 		}
 		
 		if($diffElement->[0] eq "matchedPart") {
-			print("### ", $diffElement->[1], "\n" x 2);
+			print("### Matched Part in Source File\n", $diffElement->[1], "\n");
 		}
 		
 		if($diffElement->[0] eq "unMatchedPart") {
-			print("--- ", $diffElement->[1], "\n" x 2);
+			print("--- UnMatched Part in Destination File\n", $diffElement->[1], "\n" );
 		}
 	}
 }
@@ -91,3 +120,5 @@ my $sourceFileText = readFile($sourceFile);
 my $destinationFileText = readFile($destinationFile);
 
 printDiff($sourceFileText, $destinationFileText);
+
+# perl diff.pl sourceFile destinationFile
