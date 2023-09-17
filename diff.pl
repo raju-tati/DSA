@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use Term::ANSIColor;
 
 sub splitStringOnWords {
 	my ($string) = @_;
@@ -86,17 +87,22 @@ sub printDiff {
 
 	foreach my $diffElement (@{$diff}) {
 		if($diffElement->[0] eq "unMatchedPartInStringOne") {
-			print("+++ UnMatched Part In Source File\n", $diffElement->[1], "\n" );
+			print color('bold red');
+			print($diffElement->[1]); 			## UnMatched Part In Source File
 		}
 		
 		if($diffElement->[0] eq "matchedPart") {
-			print("### Matched Part in Source File\n", $diffElement->[1], "\n");
+			print color('bold blue');
+			print($diffElement->[1]);   		## Matched Part in Source File 
 		}
 		
 		if($diffElement->[0] eq "unMatchedPart") {
-			print("--- UnMatched Part in Destination File\n", $diffElement->[1], "\n" );
+			print color('bold yellow');
+			print($diffElement->[1]);    		## UnMatched Part in Destination File 
 		}
 	}
+
+	print color('reset');
 }
 
 sub readFile {
@@ -120,5 +126,3 @@ my $sourceFileText = readFile($sourceFile);
 my $destinationFileText = readFile($destinationFile);
 
 printDiff($sourceFileText, $destinationFileText);
-
-# perl diff.pl sourceFile destinationFile
